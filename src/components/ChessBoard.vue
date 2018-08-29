@@ -1,165 +1,178 @@
 <template lang='pug'>
   .grid-wrap
-    .grid-item(v-for="(space, s) in board" :class="tileColor(s)" @click="piecePlacement(s)")
-      div(:class="[space.color, activeTile(s)]" class="tile-overlay") {{space.icon}}
-      div(class="tile-overlay" :class="{'available-tile' : space.available}")
+    .grid-row(v-for="(row, r) in board") 
+      .grid-item(v-for="(space, c) in row" :class="tileColor(r, c)" @click="piecePlacement(r, c)")
+        div(:class="[space.color, activeTile(r, c)]" class="tile-overlay") {{space.icon}}
+          span(v-if="r === 7" class="position-label-column") {{c}}
+          span(v-if="c === 'A'" class="position-label-row") {{board.length - r}}
+        div(class="tile-overlay" :class="{'available-tile' : space.available}")
 </template>
 <script>
 export default {
     data() {
       return {
         selectedPiece: null,
-        selectedSpace: null,
-        board: null,
+        selectedSpace: { row: null, column: null },
+        board: Array.from(new Array(8)).map((tile, index) => {
+          return { 
+            A: { color: null, icon: null, position: { row: index, column: 'A' }, id: null, available: false, hasMoved: false },
+            B: { color: null, icon: null, position: { row: index, column: 'B' }, id: null, available: false, hasMoved: false },
+            C: { color: null, icon: null, position: { row: index, column: 'C' }, id: null, available: false, hasMoved: false },
+            D: { color: null, icon: null, position: { row: index, column: 'D' }, id: null, available: false, hasMoved: false },
+            E: { color: null, icon: null, position: { row: index, column: 'E' }, id: null, available: false, hasMoved: false },
+            F: { color: null, icon: null, position: { row: index, column: 'F' }, id: null, available: false, hasMoved: false },
+            G: { color: null, icon: null, position: { row: index, column: 'G' }, id: null, available: false, hasMoved: false },
+            H: { color: null, icon: null, position: { row: index, column: 'H' }, id: null, available: false, hasMoved: false },
+          }
+        }),
         whitePieces: [
-          { color:'white', icon: '♟', position: 8,  id: 'p1', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 9,  id: 'p2', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 10, id: 'p3', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 11, id: 'p4', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 12, id: 'p5', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 13, id: 'p6', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 14, id: 'p7', available: false, hasMoved: false },
-          { color:'white', icon: '♟', position: 15, id: 'p8', available: false, hasMoved: false },
-          { color:'white', icon: '♜', position: 0,  id: 'r1', available: false, hasMoved: false },
-          { color:'white', icon: '♞', position: 1,  id: 'n1', available: false, hasMoved: false },
-          { color:'white', icon: '♝', position: 2,  id: 'b1', available: false, hasMoved: false },
-          { color:'white', icon: '♛', position: 3,  id: 'q' , available: false, hasMoved: false },
-          { color:'white', icon: '♚', position: 4,  id: 'k' , available: false, hasMoved: false },
-          { color:'white', icon: '♝', position: 5,  id: 'b2', available: false, hasMoved: false },
-          { color:'white', icon: '♞', position: 6,  id: 'n2', available: false, hasMoved: false },
-          { color:'white', icon: '♜', position: 7,  id: 'r2', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'A' }, id: 'p1', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'B' }, id: 'p2', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'C' }, id: 'p2', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'D' }, id: 'p3', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'E' }, id: 'p4', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'F' }, id: 'p5', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'G' }, id: 'p6', available: false, hasMoved: false },
+          { color: 'white', icon: '♟', position: { row: 6, column: 'H' }, id: 'p7', available: false, hasMoved: false },
+          { color: 'white', icon: '♜', position: { row: 7, column: 'A' }, id: 'r1', available: false, hasMoved: false },
+          { color: 'white', icon: '♞', position: { row: 7, column: 'B' }, id: 'n1', available: false, hasMoved: false },
+          { color: 'white', icon: '♝', position: { row: 7, column: 'C' }, id: 'b1', available: false, hasMoved: false },
+          { color: 'white', icon: '♛', position: { row: 7, column: 'D' }, id: 'q' , available: false, hasMoved: false },
+          { color: 'white', icon: '♚', position: { row: 7, column: 'E' }, id: 'k' , available: false, hasMoved: false },
+          { color: 'white', icon: '♝', position: { row: 7, column: 'F' }, id: 'b2', available: false, hasMoved: false },
+          { color: 'white', icon: '♞', position: { row: 7, column: 'G' }, id: 'n2', available: false, hasMoved: false },
+          { color: 'white', icon: '♜', position: { row: 7, column: 'H' }, id: 'r2', available: false, hasMoved: false },
         ],
         blackPieces: [
-          { color:'black', icon: '♟', position: 48, id: 'p1', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 49, id: 'p2', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 50, id: 'p3', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 51, id: 'p4', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 52, id: 'p5', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 53, id: 'p6', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 54, id: 'p7', available: false, hasMoved: false },
-          { color:'black', icon: '♟', position: 55, id: 'p8', available: false, hasMoved: false },
-          { color:'black', icon: '♜', position: 56, id: 'r1', available: false, hasMoved: false },
-          { color:'black', icon: '♞', position: 57, id: 'n1', available: false, hasMoved: false },
-          { color:'black', icon: '♝', position: 58, id: 'b1', available: false, hasMoved: false },
-          { color:'black', icon: '♛', position: 59, id: 'q' , available: false, hasMoved: false },
-          { color:'black', icon: '♚', position: 60, id: 'k' , available: false, hasMoved: false },
-          { color:'black', icon: '♝', position: 61, id: 'b2', available: false, hasMoved: false },
-          { color:'black', icon: '♞', position: 62, id: 'n2', available: false, hasMoved: false },
-          { color:'black', icon: '♜', position: 63, id: 'r2', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'A' }, id: 'p1', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'B' }, id: 'p2', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'C' }, id: 'p3', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'D' }, id: 'p4', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'E' }, id: 'p5', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'F' }, id: 'p6', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'G' }, id: 'p7', available: false, hasMoved: false },
+          { color: 'black', icon: '♟', position: { row: 1, column: 'H' }, id: 'p8', available: false, hasMoved: false },
+          { color: 'black', icon: '♜', position: { row: 0, column: 'A' }, id: 'r1', available: false, hasMoved: false },
+          { color: 'black', icon: '♞', position: { row: 0, column: 'B' }, id: 'n1', available: false, hasMoved: false },
+          { color: 'black', icon: '♝', position: { row: 0, column: 'C' }, id: 'b1', available: false, hasMoved: false },
+          { color: 'black', icon: '♛', position: { row: 0, column: 'D' }, id: 'q' , available: false, hasMoved: false },
+          { color: 'black', icon: '♚', position: { row: 0, column: 'E' }, id: 'k' , available: false, hasMoved: false },
+          { color: 'black', icon: '♝', position: { row: 0, column: 'F' }, id: 'b2', available: false, hasMoved: false },
+          { color: 'black', icon: '♞', position: { row: 0, column: 'G' }, id: 'n2', available: false, hasMoved: false },
+          { color: 'black', icon: '♜', position: { row: 0, column: 'H' }, id: 'r2', available: false, hasMoved: false },
         ],
       }
     },
     created() {
-      this.createBoard();
+      this.setupBoard();
     },
     methods: {
-      activeTile(i){
-        return i === this.selectedSpace ? 'active-tile' : null;
-      },
-      tileColor(i){
-        if(
-          (i >= 0 && i <= 7 && i % 2) || 
-          (i >= 16 && i <= 23 && i % 2) ||
-          (i >= 32 && i <= 39 && i % 2) ||
-          (i >= 48 && i <= 55 && i % 2) 
-          ) {
-            return 'black-tile'
-        } else if(
-          (i >= 8 && i <= 15 && (i + 1) % 2) || 
-          (i >= 24 && i <= 31 && (i + 1) % 2) ||
-          (i >= 40 && i <= 47 && (i + 1) % 2) ||
-          (i >= 56 && i <= 63 && (i + 1) % 2)
-        ){
-          return 'black-tile'
-        } else {
-          return 'white-tile'
+      activeTile(row, column) {
+        if(this.selectedSpace){
+          return row === this.selectedSpace.row && column === this.selectedSpace.column ? 'active-tile' : null;
         }
       },
-      piecePlacement(index){
-        this.selectedSpace = index;
-        switch(this.board[index].icon){
+      tileColor(row, column){
+        const c = this.getColumnIndex(row, column);
+        if(c % 2){
+          return row % 2 ? 'white-tile' : 'black-tile';
+        } else {
+          return row % 2 ? 'black-tile' : 'white-tile';
+        }
+      },
+      piecePlacement(row, column){
+        
+        this.selectedSpace = { row: row, column: column};
+        switch(this.board[row][column].icon){
           case '♟':
-            this.pawnMovement(index);
+            switch(this.board[row][column].color){
+              case 'white':
+                this.pawnMovement(row, column, -1);
+                break;
+              case 'black':
+                this.pawnMovement(row, column, 1);
+                break;
+            }
             break;
-          case '♛':
-            this.queenMovement(index);
-            break;
-          case '♝':
-            this.bishopMovement(index);
-            break;
-          case '♞':
-            this.knightMovement(index);
-            break;
-          case '♜':
-            this.rookMovement(index);
-            break;
+          // case '♛':
+          //   this.queenMovement(row, column);
+          //   break;
+          // case '♝':
+          //   this.bishopMovement(row, column);
+          //   break;
+          // case '♞':
+          //   this.knightMovement(row, column);
+          //   break;
+          // case '♜':
+          //   this.rookMovement(row, column);
+          //   break;
           case null:
-            this.emptySpace(index);
+            this.emptySpace(row, column);
             break;
         }
       },
-      emptySpace(index){
-        if(this.selectedPiece && this.board[index].available === true) {
-          let pieceIndex = this.board.indexOf(this.selectedPiece);
-          this.board[pieceIndex] = { color: null, icon: null, position: index,  id: null, available: false };
+      setupBoard(){
+        this.whitePieces.forEach((piece, index) => {
+          this.board[piece.position.row][piece.position.column] = piece;
+        })
+        this.blackPieces.forEach((piece, index) => {
+          this.board[piece.position.row][piece.position.column] = piece;
+        })
+      },
+      emptySpace(row, column){
+        if(this.selectedPiece && this.board[row][column].available === true) {
+          this.board[this.selectedPiece.position.row][this.selectedPiece.position.column] = { color: null, icon: null, position: { row: this.selectedPiece.position.row, column: this.selectedPiece.position.column }, id: null, available: false, hasMoved: false };
           this.selectedPiece.hasMoved = true;
-          this.board[index] = this.selectedPiece;
+          this.selectedPiece.position.row = row;
+          this.selectedPiece.position.column = column;
+          this.board[row][column] = this.selectedPiece;
           this.selectedPiece = null;
           this.selectedSpace = null;
-          this.board.map(space => space.available = false)
+          this.clearAvailableSpaces();
         } else {
           this.selectedPiece = null;
           this.selectedSpace = null;
-          this.board.map(space => space.available = false)
+          this.clearAvailableSpaces();
         }
       },
-      pawnMovement(index){
-        if(!this.board[index].available) {
-        switch(this.board[index].color) {
-          case 'white':
-            if(this.board[index].hasMoved) {
-              this.board.map((space, s) => s === index + 8 ? space.available = true : space.available = false)
-              this.selectedPiece = this.board[index];
-              break;
+      clearAvailableSpaces() {
+        this.board.forEach(row => { Reflect.ownKeys(row).forEach(space => { row[space].available = false }) });
+      },
+      getColumnIndex(row, column) {
+        return Object.keys(this.board[row]).indexOf(column);
+      },
+      getColumnByIndex(column, val) {
+        return Object.keys(this.board[0])[column + val];
+      },
+      pawnMovement(row, column, val) {
+        this.clearAvailableSpaces();
+        const c = this.getColumnIndex(row, column);
+        if(!this.board[row][column].available) {
+            if(this.board[row][column].hasMoved) {
+              if(!this.board[row + val][column].color) {
+                this.board[row + val][column].available = true;
+                this.selectedPiece = this.board[row][column];
+              } else {
+                try{
+                  this.board[row + val][this.getColumnByIndex(c, 1)].available = true;
+                  this.board[row + val][this.getColumnByIndex(c, -1)].available = true;
+                  this.selectedPiece = this.board[row][column];
+                } catch(err) { }
+              }
             } else {
-              this.board.map((space, s) => s === index + 8 || s === index + 16  ? space.available = true : space.available = false);
-              this.selectedPiece = this.board[index];
-              break;
+              if(!this.board[row + val][column].color)
+                this.board[row + val][column].available = true;
+                if(!this.board[row + val][column].color){
+                  this.board[row + (val + val)][column].available = true;
+                }
+                this.selectedPiece = this.board[row][column];
             }
-          case 'black':
-            if(this.board[index].hasMoved) {
-              this.board.map((space, s) => s === index - 8 ? space.available = true : space.available = false)
-              this.selectedPiece = this.board[index];
-              break;
-            } else {
-              this.board.map((space, s) => s === index - 8 || s === index - 16  ? space.available = true : space.available = false);
-              this.selectedPiece = this.board[index];
-              break;
-            }
-          }
         } else {
-          this.emptySpace(index);
+          this.emptySpace(row, column);
         }
       },
       knightMovement(index){
         if(!this.board[index].available) {
-            this.board.map((space, s) => {
-              if(
-                this.moveableSpace(s, index + 15) ||
-                this.moveableSpace(s, index - 15) ||
-                this.moveableSpace(s, index + 17) ||
-                this.moveableSpace(s, index - 17) ||
-                this.moveableSpace(s, index + 10) ||
-                this.moveableSpace(s, index - 10) ||
-                this.moveableSpace(s, index + 6)  ||
-                this.moveableSpace(s, index - 6)
-                ) { 
-                  space.available = true
-                } else { 
-                  space.available = false
-                }
-                this.selectedPiece = this.board[index];
-          })
         } else {
           this.emptySpace(index);
         }
@@ -215,7 +228,6 @@ export default {
   align-items: center
 .grid-wrap
   display: grid
-  grid-template-columns: repeat(8, 100px)
   grid-template-rows: repeat(1, 100px)
   width: 802px
   height: 802px
@@ -243,10 +255,25 @@ export default {
 .available-tile
   background: transparentize(tomato, .8) !important
   border-radius: 50%
-  top: 30px !important
-  bottom: 30px !important
-  left: 30px !important
-  right: 30px !important
+  top: 35px !important
+  bottom: 35px !important
+  left: 35px !important
+  right: 35px !important
+  animation: 1s pulse infinite
+.position-label-column
+  position: absolute
+  font-size: 12px
+  bottom: 10px
+  right: 10px
+  color: #123456
+  -webkit-text-stroke: 0px #123456
+.position-label-row
+  -webkit-text-stroke: 0px #123456
+  position: absolute
+  font-size: 12px
+  top: 10px
+  left: 10px
+  color: #123456
 .tile-overlay
   position: absolute
   top: 0
@@ -258,17 +285,24 @@ export default {
   justify-content: center
   align-items: center
   transition: .3s ease all
-.black
+.white
   color: #ffff
   -webkit-text-stroke: .5px #123456
 .black-tile
   transition: .3s ease all
   background: transparentize(#123456, .5)
-.white
+.black
   color: #123456
   -webkit-text-stroke: .5px #123456
 .white-tile
   background: white
+@keyframes pulse
+  0%
+    transform: scale(1)
+  50%
+    transform: scale(.9)
+  100%
+    transform: scale(1)
 </style>
 
 
