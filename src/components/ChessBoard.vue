@@ -153,19 +153,16 @@ export default {
                 this.board[row + val][column].available = true;
                 this.selectedPiece = this.board[row][column];
               } else {
-                try{
-                  this.board[row + val][this.getColumnByIndex(c, 1)].available = true;
-                  this.board[row + val][this.getColumnByIndex(c, -1)].available = true;
+                try{ this.board[row + val][this.getColumnByIndex(c, 1)].available = true; } catch(err) { }
+                try{ this.board[row + val][this.getColumnByIndex(c, -1)].available = true } catch(err) { }
                   this.selectedPiece = this.board[row][column];
-                } catch(err) { }
               }
             } else {
-              if(!this.board[row + val][column].color)
+              if(!this.board[row + val][column].color) {
                 this.board[row + val][column].available = true;
-                if(!this.board[row + val][column].color){
-                  this.board[row + (val + val)][column].available = true;
-                }
+                if(!this.board[row + val][column].color) this.board[row + (val + val)][column].available = true;
                 this.selectedPiece = this.board[row][column];
+              }
             }
         } else {
           this.emptySpace(row, column);
